@@ -35,7 +35,7 @@ alias scr="cd $HOME/scripts/"
 alias f=$HOME/scripts/tools/fzf/target/debug/fzf
 
 #quotes
-/home/vamsi/scripts/mh-qt/run_mhqt.sh | cowsay -f tux
+$HOME/scripts/mh-qt/run_mhqt.sh | cowsay -f tux
 #fzf
 
 
