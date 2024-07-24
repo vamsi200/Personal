@@ -1,7 +1,0 @@
-[package]
-name = "install_tools"
-version = "0.1.0"
-edition = "2021"
-
-[dependencies]
-indicatif = "0.16"
