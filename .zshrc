@@ -37,7 +37,6 @@ alias z="nvim ~/.zshrc"
 alias zs="source ~/.zshrc"
 alias cfg="cd $HOME/.config/"
 
-
 #quotes
 $HOME/scripts/mh-qt/run_mhqt.sh | cowsay -f tux
 
@@ -52,3 +51,4 @@ HISTSIZE=10000
 SAVEHIST=10000
 setopt appendhistory
 export PATH=$HOME/.local/bin:$PATH
+export PATH=$PATH:/home/vamsi/.local/share/gem/ruby/3.0.0/bin
