@@ -50,6 +50,7 @@ fn main() {
         ext if ["sh", "txt", "md"].contains(&ext) => Some("nvim"),
         _ => None,
     };
+    println!("File Directory :- {}", selected_file);
 
     if let Some(app) = application {
         Command::new(app)
