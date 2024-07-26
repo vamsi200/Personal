@@ -73,7 +73,7 @@ fn main() {
             Command::new("nvim")
                 .arg(&selected_file)
                 .status()
-                .expect("[*] Failed to open file with nvim[*]");
+                .expect("[*] Failed to open file with nvim");
         } else {
             if let Some(parent) = fs::read_dir(&selected_file).ok() {
                 for entry in parent {
