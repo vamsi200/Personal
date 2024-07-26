@@ -3,7 +3,7 @@ use std::io::{self, Write};
 use std::process::{Command, Stdio};
 
 fn main() {
-
+    // Run `rg` and `fzf` to select a file
     let selected_file = Command::new("sh")
         .arg("-c")
         .arg("rg --files $HOME | fzf")
@@ -50,15 +50,18 @@ fn main() {
         ext if ["sh", "txt", "md"].contains(&ext) => Some("nvim"),
         _ => None,
     };
-    println!("File Directory :- {}", selected_file);
+
+    println!("[*] File Directory :- {}", selected_file);
+   
 
     if let Some(app) = application {
         Command::new(app)
             .arg(&selected_file)
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
             .status()
             .expect(&format!("[*] Failed to open file with {}", app));
     } else {
-        
         print!("> Do you want to open with nvim? (y/n): ");
         io::stdout().flush().unwrap();
 
@@ -72,18 +75,15 @@ fn main() {
                 .status()
                 .expect("[*] Failed to open file with nvim[*]");
         } else {
-
             if let Some(parent) = fs::read_dir(&selected_file).ok() {
                 for entry in parent {
                     let entry = entry.expect("[*] Failed to read entry");
                     println!("{}", entry.path().display());
                 }
-            } else {
-                    
-                    println!("File Directory :- {}", selected_file);
-                   
-                                
-            }
+            }         
         }
     }
 }
+
+
+
