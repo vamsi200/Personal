@@ -26,6 +26,7 @@ fn main() {
             println!("[*] No file selected.");
             return;
         }
+        println!("[*] File DIR - {selected_file}");
 
         open_or_prompt(&selected_file);
     }
@@ -53,7 +54,7 @@ fn open_or_prompt(file: &str) {
 }
 
 fn determine_application(extension: &str) -> Option<&'static str> {
-    let firefox = ["pdf"];
+    let zathura = ["pdf"];
     let eog = ["jpg", "png", "gif", "bmp", "tiff"];
     let vlc = ["mp3", "wav", "flac", "aac", "mp4", "avi", "mkv", "mov"];
     let xdg_open = [
@@ -69,7 +70,7 @@ fn determine_application(extension: &str) -> Option<&'static str> {
     }
 
     match extension {
-        ext if contains(ext, &firefox) => Some("firefox"),
+        ext if contains(ext, &zathura) => Some("zathura"),
         ext if contains(ext, &eog) => Some("eog"),
         ext if contains(ext, &vlc) => Some("vlc"),
         ext if contains(ext, &xdg_open) => Some("xdg-open"),
