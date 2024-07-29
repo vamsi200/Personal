@@ -1,1 +1,1 @@
-# Just my personal configs
+# My personal configs & some dumb scripts
