@@ -44,8 +44,6 @@ fn main() {
         if let Err(e) = install_tools(&tools) {
             eprintln!("[*] Error occurred while installing tools: {}", e);
             process::exit(1);
-        } else {
-            println!("[*] All tools installed successfully!");
         }
 
         if let Err(e) = install_nvchad() {
