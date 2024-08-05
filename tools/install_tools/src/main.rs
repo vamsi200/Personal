@@ -68,13 +68,20 @@ fn update_db() -> io::Result<ExitStatus> {
 }
 
 fn install_nvchad() -> io::Result<ExitStatus> {
-    let nvchad_status = Command::new("git")
-        .arg("clone")
-        .arg("https://github.com/NvChad/starter")
-        .arg("~/.config/nvim")
-        .status()?;
-
-    Ok(nvchad_status)
+    println!("[*] Do you want to install NvChad? (y,n):");
+    let input = String::new();
+    if input == "y" {
+        let nvchad_status = Command::new("git")
+            .arg("clone")
+            .arg("https://github.com/NvChad/starter")
+            .arg("~/.config/nvim")
+            .stderr(Stdio::null())
+            .stdout(Stdio::null())
+            .status()?;
+        Ok(nvchad_status)
+    } else {
+        Ok(ExitStatus::from_raw(0))
+    }
 }
 
 fn install_tools(tools: &[&str]) -> io::Result<ExitStatus> {
@@ -82,14 +89,13 @@ fn install_tools(tools: &[&str]) -> io::Result<ExitStatus> {
     pb.set_style(
         ProgressStyle::default_bar()
             .template(
-                "{spinner:.green} [{elapsed_precise}] ({msg}) [{wide_bar:.cyan/blue}] {pos}/{len}",
+                "{spinner:.green} ({msg}) [{elapsed_precise}] [{wide_bar:.cyan/blue}] {pos}/{len}",
             )
             .progress_chars("#>-"),
     );
 
     for tool in tools {
-        pb.set_message(format!("[*] Installing {}", tool));
-
+        pb.set_message(format!("Installing {}", tool));
         let status = Command::new("sudo")
             .arg("pacman")
             .arg("-S")
@@ -106,10 +112,7 @@ fn install_tools(tools: &[&str]) -> io::Result<ExitStatus> {
                 } else {
                     pb.println(format!("[*] Failed to install {}", tool));
                     pb.finish_and_clear();
-                    return Err(io::Error::new(
-                        io::ErrorKind::Other,
-                        "Failed to install tool",
-                    ));
+                    return Err(io::Error::new(io::ErrorKind::Other, "Failed to install"));
                 }
             }
             Err(e) => {
@@ -120,6 +123,11 @@ fn install_tools(tools: &[&str]) -> io::Result<ExitStatus> {
         }
     }
 
-    pb.finish_with_message("\n[*] All tools installed successfully.");
+    //pb.finish_with_message("\n[*] All tools installed successfully.");
+
+    if pb.is_finished() {
+        println!("[*] All tools installed successfully.");
+    }
+
     Ok(ExitStatus::from_raw(0))
 }
