@@ -4,7 +4,7 @@ use std::os::unix::process::ExitStatusExt;
 use std::process::{self, Command, ExitStatus, Stdio};
 
 fn main() {
-    println!("[*] Updating Package Database...");
+    println!("\n[*] Updating Package Database...");
 
     if let Err(e) = update_db() {
         eprintln!("[*] Error occurred while updating database: {}", e);
@@ -41,17 +41,17 @@ fn main() {
     let choice = choice.trim().to_lowercase();
 
     if choice == "y" {
+        if let Err(e) = install_tools(&tools) {
+            eprintln!("[*] Error occurred while installing tools: {}", e);
+            process::exit(1);
+        }
+
         if let Err(e) = install_nvchad() {
             eprintln!("[*] Error while installing Nvchad: {}", e);
             process::exit(1);
         }
 
         println!("[*] Nvchad installed successfully.\n");
-
-        if let Err(e) = install_tools(&tools) {
-            eprintln!("[*] Error occurred while installing tools: {}", e);
-            process::exit(1);
-        }
     } else {
         println!("[*] Installation cancelled.");
         process::exit(0);
@@ -82,7 +82,7 @@ fn install_tools(tools: &[&str]) -> io::Result<ExitStatus> {
     pb.set_style(
         ProgressStyle::default_bar()
             .template(
-                "{spinner:.green} [{elapsed_precise}] [{wide_bar:.cyan/blue}] {pos}/{len} ({msg})",
+                "{spinner:.green} [{elapsed_precise}] ({msg}) [{wide_bar:.cyan/blue}] {pos}/{len}",
             )
             .progress_chars("#>-"),
     );
@@ -103,7 +103,6 @@ fn install_tools(tools: &[&str]) -> io::Result<ExitStatus> {
             Ok(st) => {
                 if st.success() {
                     pb.inc(1);
-                    println!("[*] Installed {tool}");
                 } else {
                     pb.println(format!("[*] Failed to install {}", tool));
                     pb.finish_and_clear();
@@ -121,6 +120,6 @@ fn install_tools(tools: &[&str]) -> io::Result<ExitStatus> {
         }
     }
 
-    pb.finish_with_message("[*] All tools installed successfully.");
+    pb.finish_with_message("\n[*] All tools installed successfully.");
     Ok(ExitStatus::from_raw(0))
 }
