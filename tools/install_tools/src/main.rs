@@ -69,7 +69,14 @@ fn update_db() -> io::Result<ExitStatus> {
 
 fn install_nvchad() -> io::Result<ExitStatus> {
     println!("[*] Do you want to install NvChad? (y,n):");
-    let input = String::new();
+    io::stdout().flush().expect("[*] Failed to flush stdout");
+
+    let mut input = String::new();
+    io::stdin()
+        .read_line(&mut input)
+        .expect("[*] Failed to read input");
+    let input = input.trim().to_lowercase();
+
     if input == "y" {
         let nvchad_status = Command::new("git")
             .arg("clone")
