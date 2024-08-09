@@ -102,6 +102,8 @@ fn install_tools(tools: &[&str]) -> io::Result<ExitStatus> {
             .progress_chars("#>-"),
     );
 
+    let mut all_success = true; // Track overall success
+
     for tool in tools {
         pb.set_message(format!("Installing {}", tool));
         let status = Command::new("sudo")
@@ -118,23 +120,24 @@ fn install_tools(tools: &[&str]) -> io::Result<ExitStatus> {
                 if st.success() {
                     pb.inc(1);
                 } else {
-                    pb.println(format!("[*] Failed to install {}", tool));
-                    pb.finish(); // Ends the progress bar
-                    println!("[*] Installation failed. See the logs for more details.");
-                    return Err(io::Error::new(io::ErrorKind::Other, "Failed to install"));
+                    eprintln!("[*] Failed to install {}", tool);
+                    all_success = false;
                 }
             }
             Err(e) => {
-                pb.println(format!("[*] Error: {}", e));
-                pb.finish(); // Ends the progress bar
-                println!("[*] An error occurred. See the logs for more details.");
-                return Err(e);
+                eprintln!("[*] Error installing {}: {}", tool, e);
+                all_success = false;
             }
         }
     }
 
     pb.finish(); // End the progress bar
-    println!("\n[*] All tools installed successfully!");
+
+    if all_success {
+        println!("\n[*] All tools installed successfully!");
+    } else {
+        println!("\n[*] Some tools failed to install. Check the logs for details.");
+    }
 
     Ok(ExitStatus::from_raw(0))
 }
