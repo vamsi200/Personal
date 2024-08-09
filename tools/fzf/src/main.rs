@@ -1,7 +1,7 @@
+use std::env;
 use std::fs;
 use std::io::{self, Write};
 use std::process::{Command, Stdio};
-use std::env;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -58,8 +58,8 @@ fn determine_application(extension: &str) -> Option<&'static str> {
     let eog = ["jpg", "png", "gif", "bmp", "tiff"];
     let vlc = ["mp3", "wav", "flac", "aac", "mp4", "avi", "mkv", "mov"];
     let xdg_open = [
-        "pdf", "jpg", "png", "gif", "bmp", "tiff", "mp3", "wav", "flac", "aac", "mp4",
-        "avi", "mkv", "mov", "zip", "tar.gz", "rar", "7z"
+        "pdf", "jpg", "png", "gif", "bmp", "tiff", "mp3", "wav", "flac", "aac", "mp4", "avi",
+        "mkv", "mov", "zip", "tar.gz", "rar", "7z",
     ];
     let sqlite3 = ["db", "sqlite"];
     let libreoffice = ["docx", "xlsx", "pptx"];
@@ -77,7 +77,6 @@ fn determine_application(extension: &str) -> Option<&'static str> {
         ext if contains(ext, &sqlite3) => Some("sqlite3"),
         ext if contains(ext, &libreoffice) => Some("libreoffice"),
         ext if contains(ext, &hex_editor) => Some("hex_editor"),
-        ext if ["sh", "txt", "md"].contains(&ext) => Some("nvim"),
         _ => None,
     }
 }
@@ -87,7 +86,9 @@ fn prompt_open_with_nvim(file: &str) {
     io::stdout().flush().expect("[*] Failed to flush stdout");
 
     let mut input = String::new();
-    io::stdin().read_line(&mut input).expect("[*] Failed to read input");
+    io::stdin()
+        .read_line(&mut input)
+        .expect("[*] Failed to read input");
     let input = input.trim().to_lowercase();
 
     if input == "y" {
