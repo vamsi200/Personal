@@ -1,87 +1,88 @@
+use std::collections::HashMap;
 use std::env;
-use std::fs;
 use std::io::{self, Write};
-use std::process::{Command, Stdio};
+use std::process::Command;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
 
     if args.len() > 1 {
-        open_file(&args[1]);
+        if let Err(e) = open_file(&args[1]) {
+            eprintln!("[*] Error: {}", e);
+        }
     } else {
-        let selected_file = Command::new("sh")
+        let output = Command::new("sh")
             .arg("-c")
-            .arg("rg --files $HOME | fzf")
-            .stdin(Stdio::piped())
-            .stdout(Stdio::piped())
-            .spawn()
-            .expect("[*] Failed to start rg and fzf")
-            .wait_with_output()
-            .expect("[*] Failed to get output from fzf")
-            .stdout;
+            .arg("rg --files --hidden $HOME | fzf")
+            .output()
+            .expect("[*] Failed to start rg and fzf");
 
-        let selected_file = String::from_utf8_lossy(&selected_file).trim().to_string();
+        let selected_file = String::from_utf8_lossy(&output.stdout).trim().to_string();
 
         if selected_file.is_empty() {
             println!("[*] No file selected.");
             return;
         }
-        println!("[*] File DIR - {selected_file}");
+        println!("[*] File DIR - {}", selected_file);
 
-        open_or_prompt(&selected_file);
+        if let Err(e) = open_or_prompt(&selected_file) {
+            eprintln!("[*] Error: {}", e);
+        }
     }
 }
 
-fn open_file(file: &str) {
-    open_or_prompt(file);
+fn open_file(file: &str) -> io::Result<()> {
+    open_or_prompt(file)
 }
 
-fn open_or_prompt(file: &str) {
+fn open_or_prompt(file: &str) -> io::Result<()> {
     let extension = file.rsplit('.').next().unwrap_or("");
-
     let application = determine_application(extension);
 
     if let Some(app) = application {
-        Command::new(app)
-            .arg(file)
-            .stdout(Stdio::null())
-            .stderr(Stdio::null())
-            .status()
-            .expect(&format!("[*] Failed to open file with {}", app));
+        Command::new(app).arg(file).status().map_err(|e| {
+            io::Error::new(
+                io::ErrorKind::Other,
+                format!("Failed to open file with {}: {}", app, e),
+            )
+        })?;
     } else {
-        prompt_open_with_nvim(file);
+        prompt_open_with_nvim(file)?;
     }
+    Ok(())
 }
 
 fn determine_application(extension: &str) -> Option<&'static str> {
-    let zathura = ["pdf"];
-    let eog = ["jpg", "png", "gif", "bmp", "tiff"];
-    let vlc = ["mp3", "wav", "flac", "aac", "mp4", "avi", "mkv", "mov"];
-    let xdg_open = [
-        "pdf", "jpg", "png", "gif", "bmp", "tiff", "mp3", "wav", "flac", "aac", "mp4", "avi",
-        "mkv", "mov", "zip", "tar.gz", "rar", "7z",
-    ];
-    let sqlite3 = ["db", "sqlite"];
-    let libreoffice = ["docx", "xlsx", "pptx"];
-    let hex_editor = ["bin"];
+    let mut apps = HashMap::new();
+    apps.insert("pdf", "zathura");
+    apps.insert("jpg", "eog");
+    apps.insert("png", "eog");
+    apps.insert("gif", "eog");
+    apps.insert("bmp", "eog");
+    apps.insert("tiff", "eog");
+    apps.insert("mp3", "vlc");
+    apps.insert("wav", "vlc");
+    apps.insert("flac", "vlc");
+    apps.insert("aac", "vlc");
+    apps.insert("mp4", "vlc");
+    apps.insert("avi", "vlc");
+    apps.insert("mkv", "vlc");
+    apps.insert("mov", "vlc");
+    apps.insert("zip", "xdg-open");
+    apps.insert("tar.gz", "xdg-open");
+    apps.insert("rar", "xdg-open");
+    apps.insert("7z", "xdg-open");
+    apps.insert("db", "sqlite3");
+    apps.insert("sqlite", "sqlite3");
+    apps.insert("docx", "libreoffice");
+    apps.insert("xlsx", "libreoffice");
+    apps.insert("pptx", "libreoffice");
+    apps.insert("bin", "hex_editor");
 
-    fn contains(ext: &str, arr: &[&str]) -> bool {
-        arr.contains(&ext)
-    }
-
-    match extension {
-        ext if contains(ext, &zathura) => Some("zathura"),
-        ext if contains(ext, &eog) => Some("eog"),
-        ext if contains(ext, &vlc) => Some("vlc"),
-        ext if contains(ext, &xdg_open) => Some("xdg-open"),
-        ext if contains(ext, &sqlite3) => Some("sqlite3"),
-        ext if contains(ext, &libreoffice) => Some("libreoffice"),
-        ext if contains(ext, &hex_editor) => Some("hex_editor"),
-        _ => None,
-    }
+    apps.get(extension).copied()
 }
 
-fn prompt_open_with_nvim(file: &str) {
+fn prompt_open_with_nvim(file: &str) -> io::Result<()> {
     print!("> Do you want to open with nvim? (y/n): ");
     io::stdout().flush().expect("[*] Failed to flush stdout");
 
@@ -92,16 +93,12 @@ fn prompt_open_with_nvim(file: &str) {
     let input = input.trim().to_lowercase();
 
     if input == "y" {
-        Command::new("nvim")
-            .arg(file)
-            .status()
-            .expect("[*] Failed to open file with nvim");
-    } else {
-        if let Some(parent) = fs::read_dir(file).ok() {
-            for entry in parent {
-                let entry = entry.expect("[*] Failed to read entry");
-                println!("{}", entry.path().display());
-            }
-        }
+        Command::new("nvim").arg(file).status().map_err(|e| {
+            io::Error::new(
+                io::ErrorKind::Other,
+                format!("Failed to open file with nvim: {}", e),
+            )
+        })?;
     }
+    Ok(())
 }
