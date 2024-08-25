@@ -78,12 +78,13 @@ fn determine_application(extension: &str) -> Option<&'static str> {
     apps.insert("xlsx", "libreoffice");
     apps.insert("pptx", "libreoffice");
     apps.insert("bin", "hex_editor");
+    apps.insert("rs", "nvim");
 
     apps.get(extension).copied()
 }
 
 fn prompt_open_with_nvim(file: &str) -> io::Result<()> {
-    print!("> Do you want to open with nvim? (y/n): ");
+    print!("> nvim? (y/n): ");
     io::stdout().flush().expect("[*] Failed to flush stdout");
 
     let mut input = String::new();

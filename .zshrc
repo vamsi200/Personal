@@ -38,6 +38,8 @@ alias zs="source /home/vamsi/.zshrc"
 alias f="/home/vamsi/scripts/Personal/tools/fzf/target/debug/fzf"
 alias blc="/home/vamsi/scripts/Personal/bash_scripts/blt.sh c"
 alias bld="/home/vamsi/scripts/Personal/bash_scripts/blt.sh d"
+alias kubectl="minikube kubectl"
+alias tht="/opt/temp-throttle/temp-throttle"
 
 #quotes
 $HOME/scripts/mh-qt/run_mhqt.sh | cowsay -f tux

@@ -136,7 +136,7 @@ fn install_tools(tools: &[&str]) -> io::Result<ExitStatus> {
     if all_success {
         println!("\n[*] All tools installed successfully!");
     } else {
-        println!("\n[*] Some tools failed to install. Check the logs for details.");
+        println!("\n[*] Some tools failed to install.");
     }
 
     Ok(ExitStatus::from_raw(0))
