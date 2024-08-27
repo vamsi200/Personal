@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::env;
 use std::io::{self, Write};
+use std::path::Path;
 use std::process::Command;
 
 fn main() {
@@ -8,7 +9,7 @@ fn main() {
 
     if args.len() > 1 {
         if let Err(e) = open_file(&args[1]) {
-            eprintln!("[*] Error: {}", e);
+            eprintln!("ERROR: {}", e);
         }
     } else {
         let output = Command::new("sh")
@@ -23,10 +24,13 @@ fn main() {
             println!("[*] No file selected.");
             return;
         }
-        println!("[*] File DIR - {}", selected_file);
 
+        if let Some(parent) = Path::new(&selected_file).parent() {
+            let parent_path = format!("\"{}\"", parent.display().to_string());
+            println!("[*] File DIR - {}", parent_path);
+        }
         if let Err(e) = open_or_prompt(&selected_file) {
-            eprintln!("[*] Error: {}", e);
+            eprintln!("ERROR: {}", e);
         }
     }
 }
@@ -43,7 +47,7 @@ fn open_or_prompt(file: &str) -> io::Result<()> {
         Command::new(app).arg(file).status().map_err(|e| {
             io::Error::new(
                 io::ErrorKind::Other,
-                format!("Failed to open file with {}: {}", app, e),
+                format!("ERROR: Failed to open file with {}: {}", app, e),
             )
         })?;
     } else {
@@ -60,6 +64,7 @@ fn determine_application(extension: &str) -> Option<&'static str> {
     apps.insert("gif", "eog");
     apps.insert("bmp", "eog");
     apps.insert("tiff", "eog");
+    apps.insert("jpeg", "eog");
     apps.insert("mp3", "vlc");
     apps.insert("wav", "vlc");
     apps.insert("flac", "vlc");
@@ -90,7 +95,7 @@ fn prompt_open_with_nvim(file: &str) -> io::Result<()> {
     let mut input = String::new();
     io::stdin()
         .read_line(&mut input)
-        .expect("[*] Failed to read input");
+        .expect("ERROR: Failed to read input");
     let input = input.trim().to_lowercase();
 
     if input == "y" {
