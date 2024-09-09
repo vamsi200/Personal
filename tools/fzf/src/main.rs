@@ -1,8 +1,8 @@
 use std::collections::HashMap;
-use std::env;
 use std::io::{self, Write};
 use std::path::Path;
 use std::process::Command;
+use std::{env, fs};
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -28,11 +28,17 @@ fn main() {
         if let Some(parent) = Path::new(&selected_file).parent() {
             let parent_path = format!("\"{}\"", parent.display().to_string());
             println!("[*] File DIR - {}", parent_path);
+            let _ = save_file_path(&parent_path);
         }
         if let Err(e) = open_or_prompt(&selected_file) {
             eprintln!("ERROR: {}", e);
         }
     }
+}
+
+fn save_file_path(file: &str) -> io::Result<()> {
+    fs::write("/tmp/file_path.txt", file)?;
+    Ok(())
 }
 
 fn open_file(file: &str) -> io::Result<()> {
