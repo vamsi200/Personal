@@ -20,10 +20,15 @@ if [ "$mode" == "fx" ]; then
     fi
 
 elif [ "$mode" == "fn" ]; then
-    file_name=$3
-    path=$2
-    GET_FILES_WITH_NAME=$(find "$path" -type f -name "*$file_name*")
-    echo "$GET_FILES_WITH_NAME"
+   if [ -n "$2" ] || [ -n "$3" ]; then
+      file_name=$3
+      path=$2
+      GET_FILES_WITH_NAME=$(find "$path" -type f -name "*$file_name*")
+      echo "$GET_FILES_WITH_NAME"
+  else
+      echo "Error: File Name Not provided"
+      exit 1
+  fi
 
 else
     echo "Error: No Arguments provided"
