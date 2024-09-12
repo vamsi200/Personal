@@ -37,14 +37,14 @@ disconnect_bluetooth() {
 }
 
 get_data_usage() {
-    get_date=$(date '%b-%d-%Y')
+    get_date=$(date +'%b-%d-%Y')
     echo -e "[*] Getting Data Usage - [$get_date]"
     data_usage=$(grep wlan0 /proc/net/dev | awk '{
     received_gb = $2 / (1024 * 1024 * 1024);
     transmitted_gb = $10 / (1024 * 1024 * 1024);
-    printf "[Received: %.2f GB, Transmitted: %.2f GB]n", received_gb, transmitted_gb
+    printf "[Received: %.2f GB, Transmitted: %.2f GB]", received_gb, transmitted_gb
 }')
-    echo "$get_date - $data_usage" >>$HOME/storage/data_usage.txt
+    echo "$get_date - $data_usage" >> $HOME/storage/data_usage.txt
     echo "[*] Data <Saved>"
 
 }
