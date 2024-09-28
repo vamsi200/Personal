@@ -2,3 +2,4 @@
 *.rs linguist-language="Rust"
 *.py linguist-language="Python"
 *.sh linguist-language="ShellScript"
+*.mk linguist-language="Makefile"
