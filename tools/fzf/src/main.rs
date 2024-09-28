@@ -90,7 +90,7 @@ fn determine_application(extension: &str) -> Option<&'static str> {
     apps.insert("pptx", "libreoffice");
     apps.insert("bin", "hex_editor");
     apps.insert("rs", "nvim");
-
+    apps.insert("sh", "nvim");
     apps.get(extension).copied()
 }
 

@@ -9,4 +9,4 @@ fi
 
 GET_MEMORY_USAGE=$(cat /proc/$PID/status | grep "VmRSS" | awk '{printf "%.2f MB\n", $2/1024}')
 
-echo "Memory::""$GET_MEMORY_USAGE"
+echo "Memory:: ""$GET_MEMORY_USAGE"

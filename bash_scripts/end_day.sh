@@ -1,4 +1,4 @@
-#! /usr/bin/zsh
+#! /usr/bin/bash
 
 stop_browser() {
     echo "[*] Stopping <Firefox and Chromium>"
@@ -20,24 +20,23 @@ stop_browser() {
     for pid in $pid_firefox $pid_chromium; do
         [ -n "$pid" ] && while ps -p "$pid" >/dev/null; do
             echo "[*] Process <$pid> is still running"
-            sleep 5
+            sleep 3
         done
     done
     echo "[*] Stopped the <Procceses>"
 }
 
 disconnect_bluetooth() {
-    echo "[*] Disconnecting <Bluetooth device>"
     bluetooth_disconnect=$($HOME/scripts/Personal/bash_scripts/blt.sh d)
+    echo $bluetooth_disconnect
     status=$?
-
     if [ $status -eq 0 ]; then
         echo "[*] Bluetooth Device <Disconnected>"
     fi
 }
 
 get_data_usage() {
-    get_date=$(date +'%b-%d-%Y')
+    get_date=$(date '+%b-%d-%Y')
     echo -e "[*] Getting Data Usage - [$get_date]"
     data_usage=$(grep wlan0 /proc/net/dev | awk '{
     received_gb = $2 / (1024 * 1024 * 1024);
@@ -46,9 +45,20 @@ get_data_usage() {
 }')
     echo "$get_date - $data_usage" >> $HOME/storage/data_usage.txt
     echo "[*] Data <Saved>"
-
+    echo "[*] Today's Usage - $data_usage"
 }
 
-disconnect_bluetooth
+shutdown_computer(){
+    for countdown in {10..0}; do 
+        echo "[*] Shutting Down in $countdown secs.."
+        sleep 1
+    done
+    systemctl poweroff
+}
+
+
+
+disconnect_bluetooth 
 stop_browser
 get_data_usage
+shutdown_computer
