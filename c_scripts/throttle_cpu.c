@@ -3,10 +3,9 @@
 #include <string.h>
 #include <unistd.h>
 
-#define MAX_TEMPERATURE 80.00
 #define FREQUENCY_DECREMENT 500000
 #define WAIT_TIME_AFTER_THROTTLE 15
-#define WAIT_TIME_AFTER_TEMP_DROP 5
+#define WAIT_TIME_AFTER_TEMP_DROP 30
 #define MAX_ATTEMPTS 5
 
 float cpu_temp;
@@ -96,12 +95,12 @@ int set_to_original_frequency(int cpu, int frequency) {
   return 0;
 }
 
-int throttle() {
+int throttle(int temperature) {
   int max_cpu = sysconf(_SC_NPROCESSORS_ONLN);
   float cpu_temp = get_cpu_temp();
   int attempt = 0;
 
-  while (cpu_temp > MAX_TEMPERATURE && attempt < MAX_ATTEMPTS) {
+  while (cpu_temp > temperature && attempt < MAX_ATTEMPTS) {
     printf("[*] Throttle attempt %d/%d\n", attempt + 1, MAX_ATTEMPTS);
 
     for (int cpu = 0; cpu < max_cpu; cpu++) {
@@ -122,7 +121,7 @@ int throttle() {
       }
     }
 
-    printf("[*] Waiting for %d seconds, Current temperature:%f...\n",
+    printf("[*] Waiting for %d seconds, Current temperature:: %f...\n",
            WAIT_TIME_AFTER_THROTTLE, cpu_temp);
     sleep(WAIT_TIME_AFTER_THROTTLE);
 
@@ -135,7 +134,7 @@ int throttle() {
     attempt++;
   }
 
-  if (cpu_temp <= MAX_TEMPERATURE) {
+  if (cpu_temp <= temperature) {
 
     printf("[*] Temperature is below the limit set. Waiting for %d seconds to "
            "confirm...\n",
@@ -143,13 +142,13 @@ int throttle() {
     sleep(WAIT_TIME_AFTER_TEMP_DROP);
     cpu_temp = get_cpu_temp();
 
-    if (cpu_temp <= MAX_TEMPERATURE) {
+    if (cpu_temp <= temperature) {
       printf("[*] Temperature is stable. Unthrottling...\n");
       return 1;
     } else {
       printf("[*] Temperature's still above limit set. Continuing "
              "throttling...\n");
-      return throttle();
+      return throttle(temperature);
     }
   } else {
     printf("[!] Maximum attempts reached. Unthrottling and exiting...\n");
@@ -174,20 +173,33 @@ void unthrottle() {
   }
 }
 
-int main() {
-  float temp = get_cpu_temp();
+int main(int argc, char *argv[]) {
+  if (argc != 2) {
+    printf("Usage: sudo %s <Temperature_Limit>\n", argv[0]);
+    exit(1);
+  }
 
+  int input_temp = atoi(argv[1]);
+  if (input_temp == 0 && argv[1][0] != '0') {
+    printf("Invalid input. Please provide a valid integer.\n");
+    exit(1);
+  }
+
+  float temp = get_cpu_temp();
   if (temp < 0) {
     printf("Error: reading CPU temperature.\n");
-  } else if (temp > MAX_TEMPERATURE) {
+    return 1;
+  }
+
+  if (temp > input_temp) {
     printf("[*] Starting Throttle...\n");
-    int success = throttle();
+    int success = throttle(input_temp);
     if (!success) {
       printf("[!] Throttling failed after max attempts. Unthrottling...\n");
     }
     unthrottle();
   } else {
-    printf("[*] Temperature is fine: %.2f°C\n", temp);
+    printf("[*] CPU Temperature is under set limit: %.2f°C\n", temp);
   }
 
   return 0;
