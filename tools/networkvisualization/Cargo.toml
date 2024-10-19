@@ -1,0 +1,9 @@
+[package]
+name = "networkvisualization"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+leptos = "0.6.15"
+pcap = "2.2.0"
+snmp = "0.2.2"
