@@ -1,7 +1,7 @@
+use std::env;
 use std::io::{self, Write};
 use std::path::Path;
 use std::process::Command;
-use std::env;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -25,7 +25,7 @@ fn main() {
         }
 
         if let Some(parent) = Path::new(&selected_file).parent() {
-            let parent_path = format!("\"{}\"", parent.display().to_string());
+            let parent_path = format!("\"{}\"", parent.display());
             if let Err(e) = copy_path(&parent_path) {
                 eprintln!("ERROR: {}", e);
             }
@@ -48,7 +48,10 @@ fn copy_path(path: &str) -> io::Result<()> {
         .arg(format!("echo {} | xclip -selection clipboard", path))
         .status()
         .map_err(|e| {
-            io::Error::new(io::ErrorKind::Other, format!("Couldn't send the path to xclip: {}", e))
+            io::Error::new(
+                io::ErrorKind::Other,
+                format!("Couldn't send the path to xclip: {}", e),
+            )
         })?;
     Ok(())
 }
@@ -70,10 +73,9 @@ fn open_or_prompt(file: &str) -> io::Result<()> {
     Ok(())
 }
 
-
 fn determine_application(extension: &str) -> Option<&'static str> {
     match extension.to_lowercase().as_str() {
-        "pdf" => Some("zathura"),
+        "pdf" => Some("okular"),
         "jpg" | "jpeg" | "png" | "gif" | "bmp" | "tiff" => Some("eog"),
         "mp3" | "wav" | "flac" | "aac" | "mp4" | "avi" | "mkv" | "mov" => Some("vlc"),
         "zip" | "tar.gz" | "rar" | "7z" => Some("xdg-open"),

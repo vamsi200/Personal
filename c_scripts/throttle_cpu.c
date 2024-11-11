@@ -197,6 +197,7 @@ int main(int argc, char *argv[]) {
       printf("[!] Throttling failed after max attempts. Unthrottling...\n");
       unthrottle();
     }
+    unthrottle();
   } else {
     printf("[*] CPU Temperature is under set limit: %.2f°C\n",
            current_cpu_temp);
