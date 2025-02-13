@@ -1,6 +1,7 @@
 # Personal configs & some scripts
 
 📦 Personal
+
 ├── 📂 bash_scripts
 
 ├── 📂 c_scripts
