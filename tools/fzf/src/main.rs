@@ -77,7 +77,7 @@ fn determine_application(extension: &str) -> Option<&'static str> {
     match extension.to_lowercase().as_str() {
         "pdf" => Some("okular"),
         "jpg" | "jpeg" | "png" | "gif" | "bmp" | "tiff" => Some("eog"),
-        "mp3" | "wav" | "flac" | "aac" | "mp4" | "avi" | "mkv" | "mov" => Some("vlc"),
+        "mp3" | "wav" | "flac" | "aac" | "mp4" | "avi" | "mkv" | "mov" => Some("mpv"),
         "zip" | "tar.gz" | "rar" | "7z" => Some("xdg-open"),
         "db" | "sqlite" => Some("sqlite3"),
         "docx" | "xlsx" | "pptx" => Some("libreoffice"),
